@@ -12,12 +12,22 @@ public class MainMenu : MonoBehaviour
 
     public TextMeshProUGUI playerText;
 
+    public TextMeshProUGUI highestScoreText;
+
     public string playerName;
+
+    public string highestScoreName;
 
     public static MainMenu Instance;
 
+    MainManager mainManager;
+
+
     private void Awake()
     {
+
+        mainManager = FindObjectOfType<MainManager>();
+
         if (Instance == null)
         {
             Instance = this;
@@ -29,10 +39,17 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-   
+    private void Start()
+    {
+        highestScoreText.text = "Best Score : " + PlayerPrefs.GetString("HighestScoreName") + " : " + PlayerPrefs.GetInt("HighestScore", 0).ToString();
+
+    }
+
+
     public void StartButton()
     {
         playerName = playerText.text;
+
         SceneManager.LoadScene(1);
     }
 }

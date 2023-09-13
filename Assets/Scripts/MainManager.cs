@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,22 +14,26 @@ public class MainManager : MonoBehaviour
 
     public static MainManager Instance;
 
+
+
     public Text ScoreText;
     public GameObject GameOverText;
     public TextMeshProUGUI scoreNameText;
 
     private bool m_Started = false;
     private int m_Points;
+    public int highestPoint;
 
     private bool m_GameOver = false;
 
-
+    GameData gameData = new GameData();
 
 
     // Start is called before the first frame update
     void Start()
     {
-        scoreNameText.text = "Best score : " + MainMenu.Instance.playerName + " : ";
+
+        LoadHighestScore();
 
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
@@ -53,6 +58,7 @@ public class MainManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 m_Started = true;
+
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
                 forceDir.Normalize();
@@ -68,18 +74,39 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+
+        SaveHighestScore();
+
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
+        highestPoint += point;
         ScoreText.text = $"Score : {m_Points}";
     }
 
 
 
+    public void SaveHighestScore()
+    {
+        if (m_Points > PlayerPrefs.GetInt("HighestScore", 0))
+        {
+            PlayerPrefs.SetInt("HighestScore", m_Points);
+            PlayerPrefs.SetString("HighestScoreName", MainMenu.Instance.playerName);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public void LoadHighestScore()
+    {
+        scoreNameText.text = "Best score : " + PlayerPrefs.GetString("HighestScoreName") + " : " + PlayerPrefs.GetInt("HighestScore", 0).ToString();
+    }
+
     public void GameOver()
     {
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
